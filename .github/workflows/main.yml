@@ -1,0 +1,30 @@
+name: Run Docker Container with x11vnc
+
+on: 
+  push:
+    branches: 
+      - main
+
+jobs:
+  run-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Run Docker Container
+      run: docker run -d -p 5900:5900 -p 6070:80 dorowu/ubuntu-desktop-lxde-vnc
+
+    - name: Install x11vnc
+      run: |
+        container_id=$(docker ps -q --filter ancestor=dorowu/ubuntu-desktop-lxde-vnc)
+        docker exec -it $container_id apt-get update
+        docker exec -it $container_id apt-get install -y x11vnc
+
+    - name: Start x11vnc
+      run: |
+        container_id=$(docker ps -q --filter ancestor=dorowu/ubuntu-desktop-lxde-vnc)
+        docker exec -it $container_id x11vnc -display :0
