@@ -1,0 +1,29 @@
+name: Tmate Session
+
+on: [push, pull_request]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up tmate session
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tmate
+        tmate -S /tmp/tmate.sock new-session -d
+        tmate -S /tmp/tmate.sock wait tmate-ready
+        tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+        tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      continue-on-error: true
+
+    - name: Keep session alive
+      run: |
+        while true; do
+          echo "Tmate session is active"
+          sleep 300
+        done
+      continue-on-error: true
