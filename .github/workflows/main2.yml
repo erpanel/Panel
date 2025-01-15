@@ -1,0 +1,26 @@
+name: Speedtest
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *' # Menjalankan setiap jam
+
+jobs:
+  speedtest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install speedtest-cli
+      run: sudo apt-get install -y speedtest-cli
+
+    - name: Run speedtest
+      run: speedtest-cli --simple
+
+    - name: Save speedtest result
+      run: |
+        speedtest-cli --json > speedtest_result.json
+        cat speedtest_result.json
+      shell: bash
